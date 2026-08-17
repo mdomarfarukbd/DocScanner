@@ -1,0 +1,7 @@
+{
+  "name": "DocScanner",
+  "description": "Offline document scanner with perspective cropping, multi-page management, on-device OCR, encrypted storage, PDF export, sharing, and printing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
