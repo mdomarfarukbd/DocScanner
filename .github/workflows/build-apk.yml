@@ -22,25 +22,29 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept Licenses & Install Android SDK 36
+      - name: Install Android Build Tools and Accept Licenses
         run: |
           yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.11.1
 
-      - name: Create Keystore & Environment files
+      - name: Prepare Local Environment and Keystore
         run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
           touch .env
+          echo "GEMINI_API_KEY=" > .env
+          
+          # Create debug keystores in all expected locations
           keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-          # Copy to parent dir as well because gradle looks for ../debug.keystore
+          cp debug.keystore app/debug.keystore 2>/dev/null || true
           cp debug.keystore ../debug.keystore 2>/dev/null || true
 
       - name: Build Debug APK
-        run: gradle :app:assembleDebug --stacktrace --no-daemon
+        run: gradle :app:assembleDebug --no-configuration-cache --no-daemon --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
